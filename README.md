@@ -1,12 +1,12 @@
-# Type-Attack :computer:
+# Type-Attack :computer: #
 ### A beginner friendly introduction to professional touch-typing through a fun game! ###
 
 Type Attack is an engaging way to sharpen your typing skills through game-based learning. The set up of the game is as follow:
-* Random words move across the screen from left to right. :arrow_right:
+* Randomly generated words move across the screen from left to right. :arrow_right:
 * The user has to type a word and hit 'enter' before it reaches the right edge of the screen. :abc:
 * The speed at which the words move will increase gradually. :fast_forward:
 
-Technical Details:
+**Technical Details:**
 * To move the text across the screen and for other visual elements, we will use the 'graphics.h' library.
 * We will use an array of structures to store the words.
 * An efficient string matching algorithm will be employed to check which words have been entered by the user.
