@@ -7,7 +7,7 @@ Type Attack is an engaging way to sharpen your typing skills through game-based 
 * The speed at which the words move will increase gradually. :fast_forward:
 
 **Technical Details:**
-* To move the text across the screen and for other visual elements, we will use the 'graphics.h' library.
+* To move the text across the screen and for other visual elements, we will use the 'ncurses.h' library.
 * We will use an array of structures to store the words.
 * An efficient string matching algorithm will be employed to check which words have been entered by the user.
 * Using the data gathered from the game, we can estimate the user's words per minute (WPM) so they can keep track of their progress.
