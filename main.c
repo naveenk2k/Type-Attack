@@ -46,9 +46,9 @@ int main()
     WINDOW *movingWords = newwin(row - (2 * scoreAndInputSize), col, scoreAndInputSize, 0);
     WINDOW *userInput = newwin(scoreAndInputSize, col, row - scoreAndInputSize, 0);
 
-    draw_borders(scoreAndLives);
+    box(scoreAndLives, 0, 0);
     // draw_borders(movingWords);
-    draw_borders(userInput);
+    box(userInput, 0, 0);
 
     // To initialize all the words (can control how many words there are using global variable 'numberOfWords')
     for (int i = 0; i < numberOfWords; i++)
@@ -83,9 +83,9 @@ int main()
             wclear(movingWords);
             wclear(userInput);
 
-            draw_borders(scoreAndLives);
+            box(scoreAndLives, 0, 0);
             // draw_borders(movingWords);
-            draw_borders(userInput);
+            box(userInput, 0, 0);
         }
 
         // draw to our windows
@@ -134,6 +134,7 @@ int getRandom(int lower, int upper)
     return (rand() % (upper - lower + 1)) + lower;
 }
 
+/*
 void draw_borders(WINDOW *screen)
 {
     int x, y, i;
@@ -159,4 +160,4 @@ void draw_borders(WINDOW *screen)
         mvwprintw(screen, 0, i, "-");
         mvwprintw(screen, y - 1, i, "-");
     }
-}
+}*/
