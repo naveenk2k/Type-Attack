@@ -12,10 +12,10 @@
 #define arraySize(arr) sizeof(arr) / sizeof(arr[0])
 
 int getRandom(int, int);
-void draw_borders(WINDOW *);
+int checkOverlap(int, int*, int);
+//void draw_borders(WINDOW *);
 
 //global variables
-
 char allWords[][20] = {"leash", "race", "competition", "flat", "wife", "door", "establish", "hell", "whip", "last", "young", "owner", "work", "jail", "range", "remedy", "minister", "wash", "draw", "electron", "motif", "marsh", "mass", "qualification", "loop", "screen", "dealer", "folk", "stain", "conspiracy", "wisecrack", "manufacturer", "present", "complete", "legend", "thread", "speed", "hostile", "active", "chemistry", "rabbit", "remain", "wheat", "expectation", "rumor", "information", "consciousness", "art", "brink", "social", "cattle", "mechanical", "veil", "grass", "notorious", "self", "inspector", "accountant", "sin", "hierarchy", "familiar", "vertical", "package", "joystick", "moral", "carbon", "echo", "user", "ground", "arrangement", "carriage", "gossip", "confront", "bulb", "treasurer", "ignorant", "bomb", "content", "fruit", "hammer", "steep", "transparent", "minority", "brick", "presidency", "accurate", "bundle", "restrain", "choice", "mild", "nervous", "partnership", "trace", "image", "peak", "spider", "budge", "knit", "flag", "member", "bubble", "bottle", "peep", "cloudy", "volleyball", "axiomatic", "fresh", "include", "far", "psychedelic", "scary", "free"};
 
 // Structures for every word
@@ -33,6 +33,7 @@ int main()
     int scoreAndInputSize = 3;
     int playerScore = 0;
     int playerLives = 3;
+    int trackY[numberOfWords];
     srand(time(0)); // to seed the random number generator (only once at the start)
 
     initscr();
@@ -54,11 +55,14 @@ int main()
     for (int i = 0; i < numberOfWords; i++)
     {
         w[i].y = getRandom(0, row - (2 * scoreAndInputSize) - 1); // last 2 rows will be for user input
+        while(checkOverlap(w[i].y, trackY, arraySize(trackY)) == 1)
+            w[i].y = getRandom(0, row - (2 * scoreAndInputSize) - 1);
+        trackY[i] = w[i].y;
         w[i].x = getRandom(-50, 0);
         strcpy(w[i].text, allWords[getRandom(0, arraySize(allWords) - 1)]);
         w[i].length = strlen(w[i].text);
         //speed should change according to time elapsed since game started (so implement clock for that)
-        w[i].speed = getRandom(1, 10); // how many characters it jumps in each frame (so should be around 1 - 10)
+        w[i].speed = 7; //getRandom(1, 10); // how many characters it jumps in each frame (so should be around 1 - 10)
     }
 
     while (1) // Main Game loop
@@ -134,6 +138,17 @@ int getRandom(int lower, int upper)
     return (rand() % (upper - lower + 1)) + lower;
 }
 
+int checkOverlap(int y, int *arr, int len)
+{
+    for(int i = 0; i<len; i++)
+    {
+        if(arr[i] == y)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
 /*
 void draw_borders(WINDOW *screen)
 {
