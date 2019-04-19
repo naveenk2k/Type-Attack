@@ -33,7 +33,7 @@ int main()
     int scoreAndInputSize = 3;
     int playerScore = 0;
     int playerLives = 3;
-    int trackY[numberOfWords];
+    int trackY[numberOfWords]; //to keep track of y coordinates of words in order to prevent overlapping of words 
     srand(time(0)); // to seed the random number generator (only once at the start)
 
     initscr();
@@ -55,9 +55,12 @@ int main()
     for (int i = 0; i < numberOfWords; i++)
     {
         w[i].y = getRandom(0, row - (2 * scoreAndInputSize) - 1); // last 2 rows will be for user input
+        
+        //recalculate y coordinates of the current word until it doesn't overlap with that of other words
         while(checkOverlap(w[i].y, trackY, arraySize(trackY)) == 1)
-            w[i].y = getRandom(0, row - (2 * scoreAndInputSize) - 1);
-        trackY[i] = w[i].y;
+            w[i].y = getRandom(0, row - (2 * scoreAndInputSize) - 1); 
+        trackY[i] = w[i].y; //append y coordinates
+
         w[i].x = getRandom(-50, 0);
         strcpy(w[i].text, allWords[getRandom(0, arraySize(allWords) - 1)]);
         w[i].length = strlen(w[i].text);
@@ -138,6 +141,7 @@ int getRandom(int lower, int upper)
     return (rand() % (upper - lower + 1)) + lower;
 }
 
+//if y is already present in arr, return 1 else 0
 int checkOverlap(int y, int *arr, int len)
 {
     for(int i = 0; i<len; i++)
