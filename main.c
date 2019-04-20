@@ -18,8 +18,7 @@ int stringMatch(char[], char[][20], int);
 
 //global variables
 char allWords[][20] = {"leash", "race", "competition", "flat", "wife", "door", "establish", "hell", "whip", "last", "young", "owner", "work", "jail", "range", "remedy", "minister", "wash", "draw", "electron", "motif", "marsh", "mass", "qualification", "loop", "screen", "dealer", "folk", "stain", "conspiracy", "wisecrack", "manufacturer", "present", "complete", "legend", "thread", "speed", "hostile", "active", "chemistry", "rabbit", "remain", "wheat", "expectation", "rumor", "information", "consciousness", "art", "brink", "social", "cattle", "mechanical", "veil", "grass", "notorious", "self", "inspector", "accountant", "sin", "hierarchy", "familiar", "vertical", "package", "joystick", "moral", "carbon", "echo", "user", "ground", "arrangement", "carriage", "gossip", "confront", "bulb", "treasurer", "ignorant", "bomb", "content", "fruit", "hammer", "steep", "transparent", "minority", "brick", "presidency", "accurate", "bundle", "restrain", "choice", "mild", "nervous", "partnership", "trace", "image", "peak", "spider", "budge", "knit", "flag", "member", "bubble", "bottle", "peep", "cloudy", "volleyball", "axiomatic", "fresh", "include", "far", "psychedelic", "scary", "free"};
-char wordsOnScreen[numberOfWords][20]; //to store all words moving on screen
-char *enteredWord; //to store word entered by user
+char wordsOnScreen[numberOfWords][20]; //to store all words moving on screen 
 
 // Structures for every word
 struct word
@@ -39,6 +38,7 @@ int main()
     int trackY[numberOfWords]; //to keep track of y coordinates of words in order to prevent overlapping of words
     srand(time(0));            // to seed the random number generator (only once at the start)
     int charX = 13; //stores position (x coordinate) to take input from userInput window
+    char *enteredWord = (char *) calloc(1, sizeof(char)); //to store word entered by user
 
     initscr();
     noecho();
@@ -111,7 +111,7 @@ int main()
 
         mvwprintw(userInput, 1, 1, "Enter word: ");
 
-        enteredWord = realloc(enteredWord, (charX - 13 + 1)*sizeof(char)); //to store word entered by user
+        enteredWord = (char *)realloc(enteredWord, (charX - 13 + 1)*sizeof(char)); //to store word entered by user
         nodelay(userInput, TRUE);
         int ch;
         //nodelay(movingWords, TRUE);
@@ -135,10 +135,14 @@ int main()
                 {
                     if (stringMatch(w[i].text, wordsOnScreen, 0) == 1)    //to check if word is present in wordsOnScreen array; if not present, dont print the word
                         mvwprintw(movingWords, w[i].y, w[i].x, w[i].text);
+                    else
+                        strcpy(w[i].text, " ");                    
                 }
                 else
                 {
-                    playerLives--;   //lose a life every time a word reaches right margin
+                    if ( strcmp(w[i].text, " ") != 0)
+                        playerLives--;   //lose a life every time a word reaches right margin
+                    strcpy(w[i].text, " ");
                     wattron(scoreAndLives, A_STANDOUT);
                     mvwprintw(scoreAndLives, 1, col - 10, "Lives: %d", playerLives); //print new player lives left
                     wattroff(scoreAndLives, A_STANDOUT);
@@ -149,16 +153,17 @@ int main()
         else
         {
             enteredWord[charX - 13] = ch;   //concatenating entered characters into one string
-            if (stringMatch(enteredWord, wordsOnScreen, 1) == 1) //if word entered by user matches a word moving on the screen
+            mvwprintw(userInput, 1, charX, "%c", ch);  //printing entered characters
+            charX++; //incrementing x coordinate to print next character
+            if (stringMatch(enteredWord, wordsOnScreen, 1) == 1) //if word entered by user matches a word moving on the screen (also removes string from array if matched)
             {
-                enteredWord = realloc(enteredWord, 1*sizeof(char));
-                mvwprintw(userInput, 1, 13, "                    ");
+                playerScore++;
+                wattron(scoreAndLives, A_STANDOUT);
+                mvwprintw(scoreAndLives, 1, 2, "Score: %d", playerScore);
+                wattroff(scoreAndLives, A_STANDOUT);
+                enteredWord = (char *)realloc(enteredWord, 1*sizeof(char));
+                mvwprintw(userInput, 1, 13, "                    "); //prints 20 spaces; to clear input
                 charX = 13;
-            }
-            else
-            {
-                mvwprintw(userInput, 1, charX, "%c", ch);  //printing entered characters
-                charX++; //incrementing x coordinate to print next character
             }
         }
         
@@ -172,6 +177,7 @@ int main()
     attroff(A_STANDOUT | A_BLINK);
     getch();
     endwin(); // Restore normal terminal behavior
+    free(enteredWord);
     return 0;
 }
 
@@ -201,7 +207,7 @@ int stringMatch(char s[], char arr[][20], int pop)
         if (strcmp(s, arr[i]) == 0)
         {
             if (pop == 1)
-                strcpy(arr[i], "\0");
+                strcpy(arr[i], " ");
             return 1;
         }
     }
