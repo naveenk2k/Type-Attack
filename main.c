@@ -34,7 +34,7 @@ int main()
     int row, col, newRow, newCol; // of the whole terminal window + in case there's a resize of window
     int scoreAndInputSize = 3;
     int playerScore = 0;
-    int playerLives = 5;
+    int playerLives = 3;
     int trackY[numberOfWords]; //to keep track of y coordinates of words in order to prevent overlapping of words
     srand(time(0));            // to seed the random number generator (only once at the start)
     int charX = 13;            //stores position (x coordinate) to take input from userInput window
@@ -43,6 +43,8 @@ int main()
     {
         enteredWord[i] = '\0';
     }
+    time_t start = time(NULL), end;
+    int numberOfWordsUsed = 0;
 
     initscr();
     noecho();
@@ -80,7 +82,7 @@ int main()
         w[i].speed = 2; //getRandom(1, 10); // how many characters it jumps in each frame (so should be around 1 - 10)
     }
 
-    while (playerLives > 0) // Main Game loop   //change it to loop while player still has lives left
+    while (playerLives > 0 && numberOfWordsUsed < numberOfWords) // Main Game loop   //change it to loop while player still has lives left
     {
         getmaxyx(stdscr, newRow, newCol);
 
@@ -136,13 +138,20 @@ int main()
                     if (stringMatch(w[i].text, wordsOnScreen, 0) == 1) //to check if word is present in wordsOnScreen array; if not present, dont print the word
                         mvwprintw(movingWords, w[i].y, w[i].x, w[i].text);
                     else
+                    {
                         strcpy(w[i].text, " ");
+                        numberOfWordsUsed++;
+                    }
                 }
                 else
                 {
                     if (strcmp(w[i].text, " ") != 0)
+                    {
                         playerLives--; //lose a life every time a word reaches right margin
+                        numberOfWordsUsed++;
+                    }
                     strcpy(w[i].text, " ");
+                    
                     wattron(scoreAndLives, A_STANDOUT);
                     mvwprintw(scoreAndLives, 1, col - 10, "Lives: %d", playerLives); //print new player lives left
                     wattroff(scoreAndLives, A_STANDOUT);
@@ -177,13 +186,19 @@ int main()
         wrefresh(movingWords);
         wrefresh(userInput);
     }
+    end = time(NULL);
+    float min = (float)(end - start) / 60.0;
+    float wpm = (float)playerScore / min;
 
     attron(A_STANDOUT | A_BLINK);
-    mvprintw((row / 2) - 1, (col / 2) - 9, "GAME OVER"); //game over screen
+    mvprintw((row / 2) - 3, (col / 2) - 4, "GAME OVER"); //game over screen
     attroff(A_STANDOUT | A_BLINK);
+    mvprintw((row / 2) - 1, (col / 2) - 5, "WPM = %.2f", wpm);
+    mvprintw((row / 2) + 1, (col / 2) - 4, "Score = %d", playerScore);
+    mvprintw((row / 2) + 3, (col / 2) - 7, "Lives lost = %d", (playerLives <= 0) ? 3 : 3 - playerLives);
     getch();
     endwin(); // Restore normal terminal behavior
-    //free(enteredWord);
+    
     return 0;
 }
 
