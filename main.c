@@ -161,25 +161,34 @@ int main()
         }
         else
         {
-            enteredWord[charX - 13] = ch;             //concatenating entered characters into one string
-            mvwprintw(userInput, 1, charX, "%c", ch); //printing entered characters
-            charX++;                                  //incrementing x coordinate to print next character
-
-            if (stringMatch(enteredWord, wordsOnScreen, 1) == 1) //if word entered by user matches a word moving on the screen (also removes string from array if matched)
+            if(ch != 127)
             {
-                playerScore++;
+                enteredWord[charX - 13] = ch;             //concatenating entered characters into one string
+                mvwprintw(userInput, 1, charX, "%c", ch); //printing entered characters
+                charX++;                                  //incrementing x coordinate to print next character
 
-                wattron(scoreAndLives, A_STANDOUT);
-                mvwprintw(scoreAndLives, 1, 2, "Score: %d", playerScore); //update playerscore
-                wattroff(scoreAndLives, A_STANDOUT);
-
-                for (int i = 0; i < 20; i++)
+                if (stringMatch(enteredWord, wordsOnScreen, 1) == 1) //if word entered by user matches a word moving on the screen (also removes string from array if matched)
                 {
-                    enteredWord[i] = '\0';
+                    playerScore++;
+
+                    wattron(scoreAndLives, A_STANDOUT);
+                    mvwprintw(scoreAndLives, 1, 2, "Score: %d", playerScore); //update playerscore
+                    wattroff(scoreAndLives, A_STANDOUT);
+
+                    for (int i = 0; i < 20; i++)
+                    {
+                        enteredWord[i] = '\0';
+                    }
+                    mvwprintw(userInput, 1, 13, "                    "); //prints 20 spaces; to clear input
+                    charX = 13;
                 }
-                mvwprintw(userInput, 1, 13, "                    "); //prints 20 spaces; to clear input
-                charX = 13;
             }
+            else
+            {
+                charX--;
+                enteredWord[charX - 13] = '\0';
+                mvwprintw(userInput, 1, charX, " ");
+            }      
         }
 
         wrefresh(scoreAndLives); // refreshes all words at the same time cause it's outside the 'i'-for loop
