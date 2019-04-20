@@ -148,20 +148,18 @@ int main()
         }
         else
         {
+            enteredWord[charX - 13] = ch;   //concatenating entered characters into one string
             if (stringMatch(enteredWord, wordsOnScreen, 1) == 1) //if word entered by user matches a word moving on the screen
             {
-                //NOT YET FULLY FUNCTIONAL; only works for first word
                 enteredWord = realloc(enteredWord, 1*sizeof(char));
                 mvwprintw(userInput, 1, 13, "                    ");
                 charX = 13;
             }
             else
             {
-                enteredWord[charX - 13] = ch;   //concatenating entered characters into one string
-                //mvwprintw(scoreAndLives, 1, 12, "%s", enteredWord);
                 mvwprintw(userInput, 1, charX, "%c", ch);  //printing entered characters
                 charX++; //incrementing x coordinate to print next character
-            }       
+            }
         }
         
         wrefresh(scoreAndLives); // refreshes all words at the same time cause it's outside the 'i'-for loop
