@@ -29,7 +29,7 @@ struct word
     int speed;
 } w[numberOfWords];
 
-int main()
+void start()
 {
     int row, col, newRow, newCol; // of the whole terminal window + in case there's a resize of window
     int scoreAndInputSize = 3;
@@ -208,7 +208,6 @@ int main()
     getch();
     endwin(); // Restore normal terminal behavior
     
-    return 0;
 }
 
 int getRandom(int lower, int upper)
