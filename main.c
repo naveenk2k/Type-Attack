@@ -9,19 +9,21 @@
 #include <stdlib.h>
 
 #define maxWordsOnScreen 30
+#define numberOfWordsAtStart 10
 #define arraySize(arr) sizeof(arr) / sizeof(arr[0])
 
 int getRandom(int, int);
 int checkOverlap(int, int *, int);
 int stringMatch(char[], char[][20], int);
+void removeElement(int *, int);
 
 //global variables
 char allWords[][20] = {"leash", "race", "competition", "flat", "wife", "door", "establish", "hell", "whip", "last", "young", "owner", "work", "jail", "range", "remedy", "minister", "wash", "draw", "electron", "motif", "marsh", "mass", "qualification", "loop", "screen", "dealer", "folk", "stain", "conspiracy", "wisecrack", "manufacturer", "present", "complete", "legend", "thread", "speed", "hostile", "active", "chemistry", "rabbit", "remain", "wheat", "expectation", "rumor", "information", "consciousness", "art", "brink", "social", "cattle", "mechanical", "veil", "grass", "notorious", "self", "inspector", "accountant", "sin", "hierarchy", "familiar", "vertical", "package", "joystick", "moral", "carbon", "echo", "user", "ground", "arrangement", "carriage", "gossip", "confront", "bulb", "treasurer", "ignorant", "bomb", "content", "fruit", "hammer", "steep", "transparent", "minority", "brick", "presidency", "accurate", "bundle", "restrain", "choice", "mild", "nervous", "partnership", "trace", "image", "peak", "spider", "budge", "knit", "flag", "member", "bubble", "bottle", "peep", "cloudy", "volleyball", "axiomatic", "fresh", "include", "far", "psychedelic", "scary", "free"};
 
 char wordsOnScreen[maxWordsOnScreen][20]; //to store all words moving on screen
-int numberOfWordsOnScreen = 10;           // start with 10 words initially, then difficulty will increase
+int numberOfWordsOnScreen = 0;            // start with 10 words initially, then difficulty will increase
 
-// Structures for every word
+// Structures for every word on the screen
 struct word
 {
     char text[20]; // Actual word
@@ -63,7 +65,7 @@ int main()
     box(userInput, 0, 0);
 
     // To initialize all the words
-    for (int i = 0; i < numberOfWordsOnScreen; i++)
+    for (int i = 0; i < numberOfWordsAtStart; i++)
     {
         w[i].y = getRandom(0, row - (2 * scoreAndInputSize) - 1); // last 2 rows will be for user input
 
@@ -74,18 +76,57 @@ int main()
         }
         trackY[i] = w[i].y; //append y coordinates
 
-        w[i].x = getRandom(-100, 0);
+        w[i].x = getRandom(-50, 0);
 
-        strcpy(w[i].text, allWords[getRandom(0, arraySize(allWords) - 1)]);
+        // So that there are no duplicates
+        int r = getRandom(0, arraySize(allWords) - 1);
+        while (allWords[r][0] == '0')
+            r = getRandom(0, arraySize(allWords) - 1);
+        strcpy(w[i].text, allWords[r]);
+        allWords[r][0] = '0';
 
         w[i].length = strlen(w[i].text);
         strcpy(wordsOnScreen[i], w[i].text); //keeps track of all moving words
         //speed should change according to time elapsed since game started (so implement clock for that)
         w[i].speed = 2; //getRandom(1, 10); // how many characters it jumps in each frame (so should be around 1 - 10)
     }
+    numberOfWordsOnScreen = numberOfWordsAtStart;
 
     while (playerLives > 0) // Main Game loop: while player still has lives left
     {
+        // For debugging
+        mvwprintw(movingWords, 1, 5, "Words on screen: %d", numberOfWordsOnScreen);
+
+        // If there are less than 5 words on the screen, add 6 more
+        if (numberOfWordsOnScreen < 5)
+        {
+            for (int i = numberOfWordsOnScreen; i < numberOfWordsOnScreen + 6; i++)
+            {
+                w[i].y = getRandom(0, row - (2 * scoreAndInputSize) - 1); // last 2 rows will be for user input
+
+                //recalculate y coordinates of the current word until it doesn't overlap with that of other words
+                while (checkOverlap(w[i].y, trackY, arraySize(trackY)) == 1)
+                {
+                    w[i].y = getRandom(0, row - (2 * scoreAndInputSize) - 1);
+                }
+                trackY[i] = w[i].y; //append y coordinates
+
+                w[i].x = getRandom(-50, 0);
+
+                // So that there are no duplicates
+                int r = getRandom(0, arraySize(allWords) - 1);
+                while (allWords[r][0] == '0')
+                    r = getRandom(0, arraySize(allWords) - 1);
+                strcpy(w[i].text, allWords[r]);
+                allWords[r][0] = '0';
+
+                w[i].length = strlen(w[i].text);
+                strcpy(wordsOnScreen[i], w[i].text); //keeps track of all moving words
+                //speed should change according to time elapsed since game started (so implement clock for that)
+                w[i].speed = 2; //getRandom(1, 10); // how many characters it jumps in each frame (so should be around 1 - 10)
+            }
+            numberOfWordsOnScreen += 6;
+        }
         /* For resizing windows */
         getmaxyx(stdscr, newRow, newCol);
         if (newRow != row || newCol != col)
@@ -121,7 +162,7 @@ int main()
         nodelay(userInput, TRUE);
         int ch;
 
-        if ((ch = mvwgetch(userInput, 1, charX)) == ERR) //gets input character by character; try getting string directly
+        if ((ch = mvwgetch(userInput, 1, charX)) == ERR) //gets input character by character;
         {
             for (int i = 0; i < numberOfWordsOnScreen; i++) // for each word on the screen, do the following
             {
@@ -146,10 +187,12 @@ int main()
                 }
                 else
                 {
-                    if (strcmp(w[i].text, " ") != 0)    // If the text is not " "
+                    if (strcmp(w[i].text, " ") != 0) // If the text is not " "
                     {
                         playerLives--; //lose a life every time a word reaches right margin
                         numberOfWordsUsed++;
+                        numberOfWordsOnScreen--;
+                        removeElement(trackY, w[i].y);
                     }
                     strcpy(w[i].text, " ");
 
@@ -174,12 +217,7 @@ int main()
                 {
                     playerScore++;
                     numberOfWordsOnScreen--;
-                    // TODO:
-                    if (numberOfWordsOnScreen < 5)
-                    {
-                        // add 6 more
-                        // addWordsOnScreen(wordsOnScreen)
-                    }
+
                     wattron(scoreAndLives, A_STANDOUT);
                     mvwprintw(scoreAndLives, 1, 2, "Score: %d", playerScore); //update playerscore
                     wattroff(scoreAndLives, A_STANDOUT);
@@ -192,7 +230,7 @@ int main()
                     charX = 13;
                 }
             }
-            else
+            else // If they entered backspace, we have to move the cursor and add a blank
             {
                 if (charX - 1 >= 13) // to avoid moving the cursor back beyond the start of input
                     charX--;
@@ -239,7 +277,7 @@ int checkOverlap(int y, int *arr, int len)
     return 0;
 }
 
-//to check if a string is present in an array of strings; return 1 if found else 0; if pop = 1, removes matched element from array
+//to check if a string is present in an array of strings; return 1 if found else 0; if pop = 1, removes first occurance of matched element from array
 int stringMatch(char s[], char arr[][20], int pop)
 {
     for (int i = 0; i < numberOfWordsOnScreen; i++)
@@ -248,13 +286,25 @@ int stringMatch(char s[], char arr[][20], int pop)
         {
             if (pop == 1)
             {
-                for (int j = i; j < numberOfWordsOnScreen; j++)
+                for (int j = i; j < numberOfWordsOnScreen - 1; j++)
                     strcpy(arr[j], arr[j + 1]);
             }
             return 1;
         }
     }
     return 0;
+}
+
+void removeElement(int *arr, int num)
+{
+    for (int i = 0; i < arraySize(arr); i++)
+    {
+        if (arr[i] == num)
+        {
+            arr[i] = -1;
+            break;
+        }
+    }
 }
 
 /*
