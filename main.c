@@ -230,6 +230,7 @@ void start()
     getch();
     endwin(); // Restore normal terminal behavior
 
+
 }
 
 int getRandom(int lower, int upper)
