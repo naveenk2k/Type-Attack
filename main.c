@@ -30,7 +30,7 @@ struct word
     int speed;
 } w[numberOfWords];
 
-int main()
+void start()
 {
     int row, col, newRow, newCol; // of the whole terminal window + in case there's a resize of window
     int scoreAndInputSize = 3;
@@ -40,12 +40,15 @@ int main()
     srand(time(0));            // to seed the random number generator (only once at the start)
     int charX = 13;            //stores position (x coordinate) to take input from userInput window
     char enteredWord[20];      //to store word entered by user
+    char username[20];
+    char mesg[]="Enter username: ";
     for (int i = 0; i < 20; i++)
     {
         enteredWord[i] = '\0';
     }
     time_t start = time(NULL), end;
     int numberOfWordsUsed = 0;
+    
 
     initscr();
     noecho();
@@ -203,17 +206,31 @@ int main()
     end = time(NULL);
     float min = (float)(end - start) / 60.0;
     float wpm = (float)playerScore / min;
+    clear();
+    //WINDOW *username = newwin(34,50,3,4);
 
+    //box(username, 0, 0);
+    //mvwprintw(username,1,1,"Enter user name: ");
+
+    
+    start_color();
+    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(4, COLOR_RED, COLOR_BLACK);
+    //attron(COLOR_PAIR(2));
+    attron(A_STANDOUT);
+    
     attron(A_STANDOUT | A_BLINK);
     mvprintw((row / 2) - 3, (col / 2) - 4, "GAME OVER"); //game over screen
     attroff(A_STANDOUT | A_BLINK);
     mvprintw((row / 2) - 1, (col / 2) - 5, "WPM = %.2f", wpm);
     mvprintw((row / 2) + 1, (col / 2) - 4, "Score = %d", playerScore);
     mvprintw((row / 2) + 3, (col / 2) - 7, "Lives lost = %d", (playerLives <= 0) ? 3 : 3 - playerLives);
+    attroff(A_STANDOUT);
+    //attroff(COLOR_PAIR(2));
     getch();
     endwin(); // Restore normal terminal behavior
 
-    return 0;
+
 }
 
 int getRandom(int lower, int upper)
