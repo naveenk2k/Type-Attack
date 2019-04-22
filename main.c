@@ -3,32 +3,48 @@
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include "gameplay.c"
 
-#define WIDTH 30 // Of window
-#define HEIGHT 5 // Of window
+#define numberOfWords 18
+#define arraySize(arr) sizeof(arr) / sizeof(arr[0])
 
-int startx = 0;
-int starty = 0;
+int getRandom(int, int);
+int checkOverlap(int, int *, int);
+int stringMatch(char[], char[][20], int);
+//void draw_borders(WINDOW *);
 
-char *choices[] = {
-    "START"};
-int n_choices = sizeof(choices) / sizeof(char *);
-void print_menu(WINDOW *menu_win, int highlight);
-void T();
-void Y();
-void P();
-void E();
-void A();
-void C();
-void K();
-int main()
+//global variables
+char allWords[][20] = {"leash", "race", "competition", "flat", "wife", "door", "establish", "hell", "whip", "last", "young", "owner", "work", "jail", "range", "remedy", "minister", "wash", "draw", "electron", "motif", "marsh", "mass", "qualification", "loop", "screen", "dealer", "folk", "stain", "conspiracy", "wisecrack", "manufacturer", "present", "complete", "legend", "thread", "speed", "hostile", "active", "chemistry", "rabbit", "remain", "wheat", "expectation", "rumor", "information", "consciousness", "art", "brink", "social", "cattle", "mechanical", "veil", "grass", "notorious", "self", "inspector", "accountant", "sin", "hierarchy", "familiar", "vertical", "package", "joystick", "moral", "carbon", "echo", "user", "ground", "arrangement", "carriage", "gossip", "confront", "bulb", "treasurer", "ignorant", "bomb", "content", "fruit", "hammer", "steep", "transparent", "minority", "brick", "presidency", "accurate", "bundle", "restrain", "choice", "mild", "nervous", "partnership", "trace", "image", "peak", "spider", "budge", "knit", "flag", "member", "bubble", "bottle", "peep", "cloudy", "volleyball", "axiomatic", "fresh", "include", "far", "psychedelic", "scary", "free", "attractive", "study", "shape", "features", "moon", "needless", "pocket", "sofa", "far-flung", "zipper", "perpetual", "crooked", "promise", "maddening", "army", "library", "fact", "side", "precious", "dangerous", "gleaming", "substantial", "bait", "cluttered", "ultra", "languid", "look", "nut", "day", "unpack", "alcoholic", "sheep", "great", "demonic", "divide", "pleasure", "thin", "irate", "finger", "glossy", "knotty", "male", "six", "deafening", "defeated", "bitter", "ski", "spotty", "prick", "meeting", "compete", "war", "object", "vessel", "slave", "expert", "purpose", "crown", "juicy", "hair", "boorish", "island", "untidy", "powder", "vulgar", "adorable", "memorise", "pin", "order", "unit", "tail", "open", "yummy", "claim", "scary", "tin", "smoggy", "lake", "push", "soda", "appreciate", "sneeze", "faulty", "terrific", "best", "attraction", "substantial", "supply", "value", "gainful", "bike", "knee", "slope", "ice", "laborer", "probable", "satisfying", "untidy", "innocent", "mouth", "tightfisted", "representative", "hospital", "tiger", "obey", "robin", "flaky", "old-fashioned", "rock", "excuse", "brief", "drown", "sea", "aloof", "face", "women", "hum", "divergent", "envious", "reach"};
+
+char wordsOnScreen[numberOfWords][20]; //to store all words moving on screen
+
+// Structures for every word
+struct word
 {
-    WINDOW *menu_win;
-    int highlight = 1;
-    int choice = 0;
-    int c;
+    char text[20]; // Actual word
+    int y, x;      // The (y, x) coordinates on the ncurses window
+    int length;    // Total number of characters
+    int speed;
+} w[numberOfWords];
+
+void start()
+{
+    int row, col, newRow, newCol; // of the whole terminal window + in case there's a resize of window
+    int scoreAndInputSize = 3;
+    int playerScore = 0;
+    int playerLives = 3;
+    int trackY[numberOfWords]; //to keep track of y coordinates of words in order to prevent overlapping of words
+    srand(time(0));            // to seed the random number generator (only once at the start)
+    int charX = 13;            //stores position (x coordinate) to take input from userInput window
+    char enteredWord[20];      //to store word entered by user
+    char username[20];
+    char mesg[]="Enter username: ";
+    for (int i = 0; i < 20; i++)
+    {
+        enteredWord[i] = '\0';
+    }
+    time_t start = time(NULL), end;
+    int numberOfWordsUsed = 0;
+
 
     initscr();
     clear();
@@ -258,6 +274,7 @@ void A()
         mvprintw(i, 34, "*");
     }
 
+<<<<<<< HEAD
     mvprintw(1, 35, "*");
     mvprintw(1, 36, "*");
     mvprintw(1, 37, "*");
@@ -274,6 +291,38 @@ void A()
     mvprintw(4, 38, "*");
 
     //Second A
+=======
+    //Game ends here
+    end = time(NULL);
+    float min = (float)(end - start) / 60.0;
+    float wpm = (float)playerScore / min;
+    clear();
+    //WINDOW *username = newwin(34,50,3,4);
+
+    //box(username, 0, 0);
+    //mvwprintw(username,1,1,"Enter user name: ");
+
+
+    start_color();
+    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(4, COLOR_RED, COLOR_BLACK);
+    //attron(COLOR_PAIR(2));
+    attron(A_STANDOUT);
+
+    attron(A_STANDOUT | A_BLINK);
+    mvprintw((row / 2) - 3, (col / 2) - 4, "GAME OVER"); //game over screen
+    attroff(A_STANDOUT | A_BLINK);
+    mvprintw((row / 2) - 1, (col / 2) - 5, "WPM = %.2f", wpm);
+    mvprintw((row / 2) + 1, (col / 2) - 4, "Score = %d", playerScore);
+    mvprintw((row / 2) + 3, (col / 2) - 7, "Lives lost = %d", (playerLives <= 0) ? 3 : 3 - playerLives);
+    attroff(A_STANDOUT);
+    //attroff(COLOR_PAIR(2));
+    getch();
+    endwin(); // Restore normal terminal behavior
+
+
+}
+>>>>>>> a60bf97aafe499e0f43275316ea4a89d240eeebd
 
     for (i = 1; i < 8; i++)
     {
