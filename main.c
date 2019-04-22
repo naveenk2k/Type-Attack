@@ -8,7 +8,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#define numberOfWords 10
+#define numberOfWords 18
 #define arraySize(arr) sizeof(arr) / sizeof(arr[0])
 
 int getRandom(int, int);
@@ -17,7 +17,8 @@ int stringMatch(char[], char[][20], int);
 //void draw_borders(WINDOW *);
 
 //global variables
-char allWords[][20] = {"leash", "race", "competition", "flat", "wife", "door", "establish", "hell", "whip", "last", "young", "owner", "work", "jail", "range", "remedy", "minister", "wash", "draw", "electron", "motif", "marsh", "mass", "qualification", "loop", "screen", "dealer", "folk", "stain", "conspiracy", "wisecrack", "manufacturer", "present", "complete", "legend", "thread", "speed", "hostile", "active", "chemistry", "rabbit", "remain", "wheat", "expectation", "rumor", "information", "consciousness", "art", "brink", "social", "cattle", "mechanical", "veil", "grass", "notorious", "self", "inspector", "accountant", "sin", "hierarchy", "familiar", "vertical", "package", "joystick", "moral", "carbon", "echo", "user", "ground", "arrangement", "carriage", "gossip", "confront", "bulb", "treasurer", "ignorant", "bomb", "content", "fruit", "hammer", "steep", "transparent", "minority", "brick", "presidency", "accurate", "bundle", "restrain", "choice", "mild", "nervous", "partnership", "trace", "image", "peak", "spider", "budge", "knit", "flag", "member", "bubble", "bottle", "peep", "cloudy", "volleyball", "axiomatic", "fresh", "include", "far", "psychedelic", "scary", "free"};
+char allWords[][20] = {"leash", "race", "competition", "flat", "wife", "door", "establish", "hell", "whip", "last", "young", "owner", "work", "jail", "range", "remedy", "minister", "wash", "draw", "electron", "motif", "marsh", "mass", "qualification", "loop", "screen", "dealer", "folk", "stain", "conspiracy", "wisecrack", "manufacturer", "present", "complete", "legend", "thread", "speed", "hostile", "active", "chemistry", "rabbit", "remain", "wheat", "expectation", "rumor", "information", "consciousness", "art", "brink", "social", "cattle", "mechanical", "veil", "grass", "notorious", "self", "inspector", "accountant", "sin", "hierarchy", "familiar", "vertical", "package", "joystick", "moral", "carbon", "echo", "user", "ground", "arrangement", "carriage", "gossip", "confront", "bulb", "treasurer", "ignorant", "bomb", "content", "fruit", "hammer", "steep", "transparent", "minority", "brick", "presidency", "accurate", "bundle", "restrain", "choice", "mild", "nervous", "partnership", "trace", "image", "peak", "spider", "budge", "knit", "flag", "member", "bubble", "bottle", "peep", "cloudy", "volleyball", "axiomatic", "fresh", "include", "far", "psychedelic", "scary", "free", "attractive", "study", "shape", "features", "moon", "needless", "pocket", "sofa", "far-flung", "zipper", "perpetual", "crooked", "promise", "maddening", "army", "library", "fact", "side", "precious", "dangerous", "gleaming", "substantial", "bait", "cluttered", "ultra", "languid", "look", "nut", "day", "unpack", "alcoholic", "sheep", "great", "demonic", "divide", "pleasure", "thin", "irate", "finger", "glossy", "knotty", "male", "six", "deafening", "defeated", "bitter", "ski", "spotty", "prick", "meeting", "compete", "war", "object", "vessel", "slave", "expert", "purpose", "crown", "juicy", "hair", "boorish", "island", "untidy", "powder", "vulgar", "adorable", "memorise", "pin", "order", "unit", "tail", "open", "yummy", "claim", "scary", "tin", "smoggy", "lake", "push", "soda", "appreciate", "sneeze", "faulty", "terrific", "best", "attraction", "substantial", "supply", "value", "gainful", "bike", "knee", "slope", "ice", "laborer", "probable", "satisfying", "untidy", "innocent", "mouth", "tightfisted", "representative", "hospital", "tiger", "obey", "robin", "flaky", "old-fashioned", "rock", "excuse", "brief", "drown", "sea", "aloof", "face", "women", "hum", "divergent", "envious", "reach"};
+
 char wordsOnScreen[numberOfWords][20]; //to store all words moving on screen
 
 // Structures for every word
@@ -39,17 +40,20 @@ void start()
     srand(time(0));            // to seed the random number generator (only once at the start)
     int charX = 13;            //stores position (x coordinate) to take input from userInput window
     char enteredWord[20];      //to store word entered by user
+    char username[20];
+    char mesg[]="Enter username: ";
     for (int i = 0; i < 20; i++)
     {
         enteredWord[i] = '\0';
     }
     time_t start = time(NULL), end;
     int numberOfWordsUsed = 0;
+    
 
     initscr();
     noecho();
     cbreak();
-    curs_set(FALSE); // Whether to display the position of cursor or not
+    curs_set(TRUE); // Whether to display the position of cursor or not
 
     // set up initial windows and get the number of rows and columns
     getmaxyx(stdscr, row, col);
@@ -73,7 +77,7 @@ void start()
         }
         trackY[i] = w[i].y; //append y coordinates
 
-        w[i].x = getRandom(-50, 0);
+        w[i].x = getRandom(-100, 0);
 
         strcpy(w[i].text, allWords[getRandom(0, arraySize(allWords) - 1)]);
         w[i].length = strlen(w[i].text);
@@ -120,7 +124,7 @@ void start()
         nodelay(userInput, TRUE);
         int ch;
 
-        if ((ch = mvwgetch(userInput, 1, 13)) == ERR) //gets input character by character; try getting string directly
+        if ((ch = mvwgetch(userInput, 1, charX)) == ERR) //gets input character by character; try getting string directly
         {
             for (int i = 0; i < numberOfWords; i++) // for each word, do the following
             {
@@ -151,7 +155,7 @@ void start()
                         numberOfWordsUsed++;
                     }
                     strcpy(w[i].text, " ");
-                    
+
                     wattron(scoreAndLives, A_STANDOUT);
                     mvwprintw(scoreAndLives, 1, col - 10, "Lives: %d", playerLives); //print new player lives left
                     wattroff(scoreAndLives, A_STANDOUT);
@@ -161,12 +165,13 @@ void start()
         }
         else
         {
-            if(ch != 127)
+            if (ch != 127)
             {
                 enteredWord[charX - 13] = ch;             //concatenating entered characters into one string
                 mvwprintw(userInput, 1, charX, "%c", ch); //printing entered characters
                 charX++;                                  //incrementing x coordinate to print next character
 
+                wmove(userInput, 1, charX);                          // Try to move the cursor according to the input
                 if (stringMatch(enteredWord, wordsOnScreen, 1) == 1) //if word entered by user matches a word moving on the screen (also removes string from array if matched)
                 {
                     playerScore++;
@@ -185,29 +190,46 @@ void start()
             }
             else
             {
-                charX--;
+                if (charX - 1 >= 13) // to avoid moving the cursor back beyond the start of input
+                    charX--;
                 enteredWord[charX - 13] = '\0';
                 mvwprintw(userInput, 1, charX, " ");
-            }      
+            }
         }
 
         wrefresh(scoreAndLives); // refreshes all words at the same time cause it's outside the 'i'-for loop
         wrefresh(movingWords);
         wrefresh(userInput);
     }
+
+    //Game ends here
     end = time(NULL);
     float min = (float)(end - start) / 60.0;
     float wpm = (float)playerScore / min;
+    clear();
+    //WINDOW *username = newwin(34,50,3,4);
 
+    //box(username, 0, 0);
+    //mvwprintw(username,1,1,"Enter user name: ");
+
+    
+    start_color();
+    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(4, COLOR_RED, COLOR_BLACK);
+    //attron(COLOR_PAIR(2));
+    attron(A_STANDOUT);
+    
     attron(A_STANDOUT | A_BLINK);
     mvprintw((row / 2) - 3, (col / 2) - 4, "GAME OVER"); //game over screen
     attroff(A_STANDOUT | A_BLINK);
     mvprintw((row / 2) - 1, (col / 2) - 5, "WPM = %.2f", wpm);
     mvprintw((row / 2) + 1, (col / 2) - 4, "Score = %d", playerScore);
     mvprintw((row / 2) + 3, (col / 2) - 7, "Lives lost = %d", (playerLives <= 0) ? 3 : 3 - playerLives);
+    attroff(A_STANDOUT);
+    //attroff(COLOR_PAIR(2));
     getch();
     endwin(); // Restore normal terminal behavior
-    
+
 }
 
 int getRandom(int lower, int upper)
@@ -242,30 +264,3 @@ int stringMatch(char s[], char arr[][20], int pop)
     }
     return 0;
 }
-/*
-void draw_borders(WINDOW *screen)
-{
-    int x, y, i;
-
-    getmaxyx(screen, y, x);
-
-    // 4 corners
-    mvwprintw(screen, 0, 0, "+");
-    mvwprintw(screen, y - 1, 0, "+");
-    mvwprintw(screen, 0, x - 1, "+");
-    mvwprintw(screen, y - 1, x - 1, "+");
-
-    // sides
-    for (i = 1; i < (y - 1); i++)
-    {
-        mvwprintw(screen, i, 0, "|");
-        mvwprintw(screen, i, x - 1, "|");
-    }
-
-    // top and bottom
-    for (i = 1; i < (x - 1); i++)
-    {
-        mvwprintw(screen, 0, i, "-");
-        mvwprintw(screen, y - 1, i, "-");
-    }
-}*/
