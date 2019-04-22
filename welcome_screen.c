@@ -18,7 +18,7 @@ char *choices[] = {
 		  };
 int n_choices = sizeof(choices) / sizeof(char *);
 void print_menu(WINDOW *menu_win, int highlight);
-void T();
+void T(); 
 void Y();
 void P();
 void E();
@@ -31,16 +31,6 @@ int main()
 	int highlight = 1;
 	int choice = 0;
 	int c;
-	int row, col, newRow, newCol; // of the whole terminal window + in case there's a resize of window
-    int scoreAndInputSize = 3;
-    int playerScore = 0;
-    int playerLives = 3;
-    int trackY[numberOfWords]; //to keep track of y coordinates of words in order to prevent overlapping of words
-    srand(time(0));            // to seed the random number generator (only once at the start)
-    int charX = 13;            //stores position (x coordinate) to take input from userInput window
-    char enteredWord[20];      //to store word
-
-
 
 	initscr();
 	clear();
@@ -57,6 +47,7 @@ int main()
 	init_pair(5, COLOR_CYAN, COLOR_BLACK);
 	menu_win = newwin(HEIGHT, WIDTH, starty, startx);
 	keypad(menu_win, TRUE);
+	//attron(A_BLINK);
 
 	attron(COLOR_PAIR(5));
 	T();
@@ -79,6 +70,8 @@ int main()
 	attron(COLOR_PAIR(4));
 	K();
 	attroff(COLOR_PAIR(4));
+
+	//attroff(A_BLINK);
 
 	refresh();
 	print_menu(menu_win, highlight);
@@ -111,10 +104,7 @@ int main()
 			break;
 
 	}	
-	//mvprintw(23, 0, "You chose choice %d with choice string %s\n", choice, choices[choice - 1]);
-	//clrtoeol();
-	//refresh();
-	//endwin();
+
 	return 0;
 }
 
